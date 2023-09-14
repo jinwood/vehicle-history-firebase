@@ -1,19 +1,23 @@
-/**
- * Import function triggers from their respective submodules:
- *
- * import {onCall} from "firebase-functions/v2/https";
- * import {onDocumentWritten} from "firebase-functions/v2/firestore";
- *
- * See a full list of supported triggers at https://firebase.google.com/docs/functions
- */
+import * as functions from "firebase-functions";
+import * as admin from "firebase-admin";
+import {initializeApp} from "firebase-admin";
+import {firebaseConfig} from "firebase-functions";
 
-import {onRequest} from "firebase-functions/v2/https";
-import * as logger from "firebase-functions/logger";
+const app = initializeApp(firebaseConfig);
 
-// Start writing functions
-// https://firebase.google.com/docs/functions/typescript
+exports.createFirestoreUser = functions.auth.user().onCreate(async (user) => {
+  const db = admin.firestore();
+  const userDocRef = db.collection("users").doc(user.uid);
 
-// export const helloWorld = onRequest((request, response) => {
-//   logger.info("Hello logs!", {structuredData: true});
-//   response.send("Hello from Firebase!");
-// });
+  const userData = {
+    email: user.email,
+    displayName: user.displayName,
+  };
+
+  try {
+    await userDocRef.set(userData);
+    console.log("User document createdin Firestore.");
+  } catch (error) {
+    console.error("Error creating user document:", error);
+  }
+});
