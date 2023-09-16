@@ -1,9 +1,9 @@
 import * as functions from "firebase-functions";
 import * as admin from "firebase-admin";
 import {initializeApp} from "firebase-admin";
-import {firebaseConfig} from "firebase-functions";
+import {firebaseConfig} from "../config";
 
-const app = initializeApp(firebaseConfig);
+initializeApp(firebaseConfig);
 
 exports.createFirestoreUser = functions.auth.user().onCreate(async (user) => {
   const db = admin.firestore();
